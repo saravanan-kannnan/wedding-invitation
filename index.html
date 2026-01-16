@@ -15,37 +15,116 @@
     box-sizing: border-box;
 }
 
+/* ================= MILKY WAY BACKGROUND ================= */
 body {
     min-height: 100vh;
-    background: radial-gradient(circle at top, #1a1a1a, #000000);
     font-family: 'Poppins', sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    overflow: hidden;
     color: #e6e6e6;
+    background:
+        radial-gradient(ellipse at 20% 20%, rgba(120, 80, 255, 0.15), transparent 60%),
+        radial-gradient(ellipse at 80% 30%, rgba(255, 180, 120, 0.12), transparent 55%),
+        radial-gradient(circle at center, #1a1446 0%, #06010f 70%, #000000 100%);
 }
 
+/* ================= STAR FIELD ================= */
+.stars {
+    position: fixed;
+    inset: 0;
+    background-image:
+        radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+        radial-gradient(1px 1px at 30% 80%, #fff, transparent),
+        radial-gradient(1px 1px at 70% 40%, #fff, transparent),
+        radial-gradient(2px 2px at 90% 10%, #fff, transparent),
+        radial-gradient(1px 1px at 50% 60%, #fff, transparent);
+    background-size: 400px 400px;
+    animation: twinkle 6s infinite alternate;
+    z-index: 0;
+}
+
+@keyframes twinkle {
+    from { opacity: 0.6; }
+    to   { opacity: 1; }
+}
+
+/* ================= SHOOTING STARS ================= */
+.shooting-stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.shooting-star {
+    position: absolute;
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0));
+    opacity: 0.8;
+    transform: rotate(-45deg);
+    animation: shoot 2s ease-in-out forwards;
+}
+
+@keyframes shoot {
+    0% {
+        transform: translateX(0) translateY(0) rotate(-45deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-600px) translateY(600px) rotate(-45deg);
+        opacity: 0;
+    }
+}
+
+/* ================= FLOWER RAIN ================= */
+.flower-rain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.flower {
+    position: absolute;
+    top: -60px;
+    font-size: 26px;
+    opacity: 0.6;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-60px) rotate(0deg);
+        opacity: 0;
+    }
+    10% { opacity: 0.7; }
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* ================= INVITATION CARD ================= */
 .invite-card {
+    position: relative;
+    z-index: 3;
     max-width: 420px;
     width: 100%;
-    background: linear-gradient(160deg, #0e0e0e, #1a1a1a);
+    background: linear-gradient(160deg, rgba(15,15,30,0.95), rgba(10,10,10,0.95));
     border-radius: 24px;
     padding: 42px 30px;
     text-align: center;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.9);
     animation: luxuryFade 1.5s ease;
+    backdrop-filter: blur(6px);
 }
 
 @keyframes luxuryFade {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .tagline {
@@ -60,12 +139,10 @@ h1 {
     font-size: 36px;
     font-weight: 600;
     color: #f5e6b8;
-    margin-bottom: 6px;
 }
 
 .amp {
     font-size: 24px;
-    font-weight: 400;
     color: #c9a45c;
 }
 
@@ -74,7 +151,6 @@ h1 {
     height: 2px;
     background: linear-gradient(to right, #8c6b2f, #e8d8a8, #8c6b2f);
     margin: 22px auto;
-    border-radius: 2px;
 }
 
 .subtitle {
@@ -87,7 +163,6 @@ h1 {
 .details {
     font-size: 14px;
     line-height: 1.9;
-    color: #e0e0e0;
 }
 
 .details span {
@@ -95,7 +170,6 @@ h1 {
     margin-top: 12px;
     color: #c9a45c;
     font-weight: 500;
-    letter-spacing: 0.5px;
 }
 
 .venue {
@@ -114,12 +188,6 @@ h1 {
     text-decoration: none;
     font-size: 14px;
     font-weight: 600;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.map-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(201,164,92,0.45);
 }
 
 .footer {
@@ -132,11 +200,13 @@ h1 {
 
 <body>
 
+<div class="stars"></div>
+<div class="shooting-stars" id="shootingStars"></div>
+<div class="flower-rain" id="flowerRain"></div>
+
 <div class="invite-card">
     <div class="tagline">THE WEDDING CELEBRATION</div>
-
     <h1>Saravanan <span class="amp">&</span> Rubini</h1>
-
     <div class="divider"></div>
 
     <p class="subtitle">
@@ -165,6 +235,37 @@ h1 {
         Your presence will add grace to our celebration
     </div>
 </div>
+
+<script>
+/* Anemone Flower Rain */
+const flowers = ["❀","✿","❁"];
+const flowerContainer = document.getElementById("flowerRain");
+
+function createFlower() {
+    const flower = document.createElement("div");
+    flower.className = "flower";
+    flower.innerText = flowers[Math.floor(Math.random() * flowers.length)];
+    flower.style.left = Math.random() * 100 + "vw";
+    flower.style.animationDuration = (8 + Math.random() * 6) + "s";
+    flower.style.fontSize = (18 + Math.random() * 14) + "px";
+    flowerContainer.appendChild(flower);
+    setTimeout(() => flower.remove(), 15000);
+}
+setInterval(createFlower, 600);
+
+/* Shooting Stars */
+const shootingContainer = document.getElementById("shootingStars");
+
+function createShootingStar() {
+    const star = document.createElement("div");
+    star.className = "shooting-star";
+    star.style.top = Math.random() * 40 + "vh";
+    star.style.left = (60 + Math.random() * 40) + "vw";
+    shootingContainer.appendChild(star);
+    setTimeout(() => star.remove(), 2000);
+}
+setInterval(createShootingStar, 4500);
+</script>
 
 </body>
 </html>
